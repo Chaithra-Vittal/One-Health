@@ -1,0 +1,422 @@
+import java.awt.Button;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+ 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+ 
+public class SwingJTextFieldExampleFrame extends JFrame  {
+     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1927825705131809212L;
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private String fullName;
+    private String address1;
+    private String address2;
+    private String pin;
+    private String cellNo;
+    private String emailId;
+ 
+    public SwingJTextFieldExampleFrame(){
+         
+        setSize(500,600);
+        setTitle("JTextField Demo");
+        JSplitPane splitPane = new JSplitPane();
+        splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(250);
+         
+        final JTextArea textArea = new JTextArea(40, 50);
+        JScrollPane scrollText = new JScrollPane(textArea);
+        textArea.setEditable(false);
+         
+        splitPane.setLeftComponent(scrollText);
+        add(splitPane);
+         
+        JPanel panel = new JPanel(new GridLayout(0,1));
+         
+        splitPane.setRightComponent(panel);
+         
+        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel fullNamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel addressPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel contactsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel submitPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+         
+        addNameControls(namePanel,fullNamePanel);
+        addAddressControls(addressPanel);
+        addContactsControls(contactsPanel);
+         
+        JButton submitButton = new JButton("Generate Contact Details");
+        submitButton.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent evt) {
+                if(SwingUtilities.isLeftMouseButton(evt)){
+                    String fullStr = "Name is:"+getFullName();
+                    fullStr += "\nAddress is: "+getAddress1()+" "+getAddress2()+
+                    "\nPin is:"+getPin()+
+                    "\nPhone No is: "+getCellNo()+
+                    "\nEmail Id is: "+getEmailId();
+                    textArea.setText(fullStr);
+                }
+            }
+        });
+        submitPanel.add(submitButton);
+         
+        panel.add(namePanel);
+        panel.add(fullNamePanel);
+        panel.add(addressPanel);
+        panel.add(contactsPanel);
+        panel.add(submitPanel);
+    }
+     
+    private void addNameControls(JPanel namePanel, JPanel fullNamePanel){
+        JLabel fName = new JLabel("First name: ");
+        namePanel.add(fName);
+         
+        final JTextField firstName = new JTextField(15);
+        firstName.setBackground(Color.YELLOW);
+                 
+        firstName.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                char letter = e.getKeyChar();
+                if (firstName.getText().length() >= 15 ) 
+                    e.consume();
+                else if(!Character.isLetter(letter)){
+                    e.consume();
+                }
+            }  
+        });
+         
+        firstName.addFocusListener(new FocusListener(){
+            public void focusGained(FocusEvent fe){
+                 
+            }
+             
+            public void focusLost(FocusEvent fe){
+                setFirstName(firstName.getText());
+            }
+        });
+         
+        namePanel.add(firstName);
+         
+        JLabel mName = new JLabel("Middle name: ");
+        namePanel.add(mName);
+         
+        final JTextField middleName = new JTextField(15);
+        middleName.setBackground(Color.YELLOW);
+        namePanel.add(middleName);
+         
+        middleName.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) { 
+                char letter = e.getKeyChar();
+                if (middleName.getText().length() >= 15 ){ 
+                    e.consume();
+                }
+                else if(!Character.isLetter(letter)){
+                    e.consume();
+                }
+            }  
+        });
+         
+        middleName.addFocusListener(new FocusListener(){
+            public void focusGained(FocusEvent fe){
+                 
+            }
+             
+            public void focusLost(FocusEvent fe){
+                setMiddleName(middleName.getText());
+            }
+        });
+         
+        JLabel lName = new JLabel("Last name: ");
+        namePanel.add(lName);
+         
+        final JTextField lastName = new JTextField(15);
+        lastName.setBackground(Color.YELLOW);
+        lastName.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) { 
+                char letter = e.getKeyChar();
+                if (middleName.getText().length() >= 15 ){ 
+                    e.consume();
+                }
+                else if(!Character.isLetter(letter)){
+                    e.consume();
+                } 
+            }  
+        });
+         
+        lastName.addFocusListener(new FocusListener(){
+            public void focusGained(FocusEvent fe){
+                 
+            }
+             
+            public void focusLost(FocusEvent fe){
+                setLastName(lastName.getText());
+            }
+        });
+         
+        namePanel.add(lastName);
+        addFullNameControls(fullNamePanel,firstName,middleName,lastName);
+    }
+     
+    private void addFullNameControls(JPanel fullNamePanel, final JTextField firstName,final JTextField middleName, final JTextField lastName){
+        JLabel fullNameTxt = new JLabel("Full name: ");
+        fullNamePanel.add(fullNameTxt);
+         
+        final JTextField fullName = new JTextField(60);
+        fullName.setEditable(false);
+                 
+        fullNamePanel.add(fullName);
+         
+        final Button button = new Button("Generate Full Name");
+        button.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent evt) {
+                if(SwingUtilities.isLeftMouseButton(evt)){
+                    String fName = firstName.getText();
+                    String mName = middleName.getText();
+                    String lName = lastName.getText();
+                    if(mName.length() > 0)
+                        fullName.setText(fName+" "+mName+" "+lName);
+                    else
+                        fullName.setText(fName+" "+lName);
+                    setFullName(fName+" "+mName+" "+lName);
+                }
+            }
+        });
+         
+        fullNamePanel.add(button);
+    }
+     
+    private void addAddressControls(JPanel addressPanel){
+        JLabel address1Lbl = new JLabel("Address1: ");
+        addressPanel.add(address1Lbl);
+         
+        final JTextField address1 = new JTextField(50);
+        address1.addFocusListener(new FocusListener(){
+             
+            public void focusLost(FocusEvent fe){
+                setAddress1(address1.getText());
+            }
+             
+            public void focusGained(FocusEvent fe){
+                 
+            }
+        });
+         
+        address1.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) { 
+                if (address1.getText().length() >= 50 ) 
+                    e.consume(); 
+            }  
+        });
+        addressPanel.add(address1);
+         
+        JLabel addressLb2 = new JLabel("Address 2: ");
+        addressPanel.add(addressLb2);
+         
+        final JTextField address2 = new JTextField(20);
+        address2.addFocusListener(new FocusListener(){
+             
+            public void focusLost(FocusEvent fe){
+                setAddress2(address2.getText());
+            }
+             
+            public void focusGained(FocusEvent fe){
+                 
+            }
+        });
+ 
+        address2.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) { 
+                if (address2.getText().length() >= 20 ) 
+                    e.consume(); 
+            }  
+        });
+        addressPanel.add(address2);
+         
+        JLabel addressLb3 = new JLabel("Pin: ");
+        addressPanel.add(addressLb3);
+         
+        final JTextField pin = new JTextField(6);
+        pin.addFocusListener(new FocusListener(){
+             
+            public void focusLost(FocusEvent fe){
+                setPin(pin.getText());
+            }
+             
+            public void focusGained(FocusEvent fe){
+                 
+            }
+        });
+         
+        pin.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) { 
+                char letter = e.getKeyChar();
+                if (pin.getText().length() >= 15 ){ 
+                    e.consume();
+                }
+                else if(!Character.isDigit(letter)){
+                    e.consume();
+                } 
+            }  
+        });
+        addressPanel.add(pin);
+    }
+     
+    private void addContactsControls(JPanel contactPanel){
+        JLabel phone = new JLabel("Cell No: ");
+        contactPanel.add(phone);
+         
+        final JTextField phoneNo = new JTextField(10);
+        phoneNo.addFocusListener(new FocusListener(){
+             
+            public void focusLost(FocusEvent fe){
+                setCellNo(phoneNo.getText());
+            }
+             
+            public void focusGained(FocusEvent fe){
+                 
+            }
+        });
+ 
+        phoneNo.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                char letter = e.getKeyChar();
+                if (phoneNo.getText().length() >= 10 ) 
+                    e.consume();
+                else if(!Character.isDigit(letter)){
+                    e.consume();
+                }
+            }  
+        });
+         
+        contactPanel.add(phoneNo);
+         
+        JLabel email = new JLabel("Email Id: ");
+        contactPanel.add(email);
+         
+        final JTextField emailId = new JTextField(30);
+        emailId.addFocusListener(new FocusListener(){
+             
+            public void focusLost(FocusEvent fe){
+                String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+                Pattern pat = Pattern.compile(ePattern);
+                Matcher match = pat.matcher(emailId.getText());
+                if(!match.matches()){
+                    JOptionPane.showMessageDialog(emailId, "Wrong email id format.");
+                    emailId.setText("");
+                }
+                setEmailId(emailId.getText());
+            }
+             
+            public void focusGained(FocusEvent fe){
+                 
+            }
+        });
+        contactPanel.add(emailId);
+         
+        emailId.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) { 
+                if (emailId.getText().length() >= 30 ){ 
+                    e.consume();
+                }
+            }  
+        });
+                 
+        contactPanel.add(emailId);
+    }
+ 
+    public String getFirstName() {
+        return firstName;
+    }
+ 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+ 
+    public String getMiddleName() {
+        return middleName;
+    }
+ 
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+ 
+    public String getLastName() {
+        return lastName;
+    }
+ 
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+ 
+    public String getAddress1() {
+        return address1;
+    }
+ 
+    public void setAddress1(String address1) {
+        this.address1 = address1;
+    }
+ 
+    public String getAddress2() {
+        return address2;
+    }
+ 
+    public void setAddress2(String address2) {
+        this.address2 = address2;
+    }
+ 
+    public String getPin() {
+        return pin;
+    }
+ 
+    public void setPin(String pin) {
+        this.pin = pin;
+    }
+ 
+    public String getCellNo() {
+        return cellNo;
+    }
+ 
+    public void setCellNo(String cellNo) {
+        this.cellNo = cellNo;
+    }
+ 
+    public String getEmailId() {
+        return emailId;
+    }
+ 
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
+    }
+ 
+    public String getFullName() {
+        return fullName;
+    }
+ 
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+     
+}
